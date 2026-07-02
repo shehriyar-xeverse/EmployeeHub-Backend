@@ -22,3 +22,13 @@ export const getAllUsers  = async  () => {
     const [rows] = await pool.execute(sql)
     return  rows;
 }
+
+// get Profile 
+export const getUserProfileModel = async (userId) => {
+    const [rows] = await pool.query(
+        `SELECT id,name,email,created_at FROM users WHERE id = ?`,
+        [userId]
+    );
+
+    return rows;
+};

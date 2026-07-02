@@ -4,7 +4,8 @@ import {
     register,
     getUsers,
     login,
-    logoutUser
+    logoutUser,
+    getUserProfile
 } from "../controllers/user.controller.js";
 
 import {
@@ -16,5 +17,6 @@ userRouter.post("/register",register);
 userRouter.post("/login", login);
 userRouter.post("/logout", logoutUser);
 userRouter.get( "/users",verifyToken,getUsers);
+userRouter.get("/profile", verifyToken, getUserProfile);
 
 export default userRouter;

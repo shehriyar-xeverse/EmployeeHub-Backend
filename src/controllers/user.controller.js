@@ -4,6 +4,7 @@ import {
   createUser,
   findUserByEmail,
   getAllUsers,
+  getUserProfileModel
 } from "../models/user.model.js";
 
 export const register = async (req, res) => {
@@ -98,4 +99,33 @@ export const logoutUser = (req, res) => {
   res.status(200).json({
     message: "Logout Successful",
   });
+};
+
+
+
+
+
+export const getUserProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const user = await getUserProfileModel(userId);
+        if (user.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Profile fetched successfully",
+            data: user[0]
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
 };
