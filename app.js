@@ -1,7 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import userRouter from './src/routes/user.router.js'
+import adminRouter from './src/routes/admin.router.js'
 import cookieParser from "cookie-parser"; 
 import employeeRouter from './src/routes/employee.router.js';
 dotenv.config()
@@ -22,7 +22,7 @@ app.get('/', (req, res) => {
 })
 
 
-app.use('/api', userRouter)
+app.use('/api', adminRouter)
 app.use('/api', employeeRouter)
 
 export default app

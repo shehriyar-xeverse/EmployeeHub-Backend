@@ -1,14 +1,23 @@
 import { AddEmployee,allEmployees,deleteEmployee,SingleEmployee ,updateEmployee} from "../models/employee.model.js";
 import {getIO} from '../config/socket.js'
+import { uploadToEmployeeImage } from "../utils/cloudinaryUpload.js";
 
 
 export const createEmployee = async (req, res) => {
+  console.log("Request file from controller",req.file)
   try {
     const { name,email,department,salary } = req.body;
-    const employee = await AddEmployee(name,email,department,salary )
+    let employee_Image ; 
+    const cloudinaryResponse = await uploadToEmployeeImage(req.file.buffer)
 
-    const io = getIO()
-    io.emit("employeeCreated", employee);
+
+      employee_Image = cloudinaryResponse.secure_url;
+    const employee = await AddEmployee(name,email,department,salary, employee_Image)
+
+
+
+      const io = getIO()
+      io.emit("employeeCreated", employee);
 
     res.status(201).json({
       message: "Employee Successfully Created",

@@ -1,24 +1,28 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import {
-  createUser,
-  findUserByEmail,
-  getAllUsers,
-  getUserProfileModel
-} from "../models/user.model.js";
+createAdmin,
+findAdminByEmail,
+getAllAdmins,
+getAdminProfileModel,
+updateProfile,
+} from "../models/admin.model.js";
+import { uploadToProfileImage } from "../utils/cloudinaryUpload.js";
+import {getIO} from '../config/socket.js'
 
-export const register = async (req, res) => {
+
+export const registerAdmin = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    const existingUser = await findUserByEmail(email);
-    if (existingUser) {
+    const existingAdmin = await findAdminByEmail(email);
+    if (existingAdmin) {
       return res.status(400).json({
         message: "user Already Exist",
       });
     }
     const hashPassword = await bcrypt.hash(password, 10);
-    await createUser(name, email, hashPassword);
+    await createAdmin(name, email, hashPassword);
     res.status(201).json({
       message: "user successfully Registered",
     });
@@ -29,11 +33,11 @@ export const register = async (req, res) => {
   }
 };
 
-export const login = async (req, res) => {
+export const loginAdmin = async (req, res) => {
 
   try {
     const { email, password } = req.body;
-    const user = await findUserByEmail(email);
+    const user = await findAdminByEmail(email);
     if (!user) {
       return res.status(404).json({
         message: "user Not Found",
@@ -64,9 +68,6 @@ export const login = async (req, res) => {
     sameSite: "lax",
     maxAge: 24 * 60 * 60 * 1000,
       });
-
-
-
     res.status(200).json({
       message: "Login Successful",
       token,
@@ -78,9 +79,9 @@ export const login = async (req, res) => {
   }
 };
 
-export const getUsers = async (req, res) => {
+export const getAdmins = async (req, res) => {
   try {
-    const users = await getAllUsers();
+    const users = await getAllAdmins();
     res.json(users);
   } catch (error) {
     res.status(500).json({
@@ -89,8 +90,7 @@ export const getUsers = async (req, res) => {
   }
 };
 
-
-export const logoutUser = (req, res) => {
+export const logoutAdmin = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
     sameSite: "lax",
@@ -101,14 +101,10 @@ export const logoutUser = (req, res) => {
   });
 };
 
-
-
-
-
-export const getUserProfile = async (req, res) => {
+export const getAdminProfile = async (req, res) => {
     try {
         const userId = req.user.id;
-        const user = await getUserProfileModel(userId);
+        const user = await getAdminProfileModel(userId);
         if (user.length === 0) {
             return res.status(404).json({
                 success: false,
@@ -128,4 +124,35 @@ export const getUserProfile = async (req, res) => {
 
     }
 
+};
+
+export const updateProfileImage = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Profile image is required",
+      });
+    }
+    const result = await uploadToProfileImage(req.file.buffer);
+    const profile_image = result.secure_url;
+    await updateProfile(userId, profile_image);
+    
+      const io = getIO()
+      io.emit("changeAdminImage", profile_image);
+
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile image updated successfully",
+      profile_image: profile_image,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };

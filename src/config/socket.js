@@ -1,5 +1,4 @@
 import { Server } from "socket.io";
-
 let io;
 
 
@@ -13,9 +12,9 @@ export const initSocket = (server) => {
 
 
    io.on("connection", (socket) => {
-    console.log("Client Connected", socket.id);
+    // console.log("Client Connected", socket.id);
     socket.on("disconnect", () => {
-        console.log("Client disconnected", socket.id)
+        // console.log("Client disconnected", socket.id)
     })
    })
 

@@ -2,9 +2,9 @@ import { pool } from "../config/db.js";
 
 
 // add emplyee 
-export const AddEmployee = async (name,email,department,salary) => {
-    const sql = `INSERT  INTO empolyees (name,email,department,salary) VALUES (?, ?, ?,?)`;
-    const [result] = await pool.execute(sql,[name,email,department,salary])
+export const AddEmployee = async (name,email,department,salary,employee_image) => {
+    const sql = `INSERT  INTO empolyees (name,email,department,salary,employee_image) VALUES (?, ?, ?,?,?)`;
+    const [result] = await pool.execute(sql,[name,email,department,salary,employee_image])
 
 
     const [rows] = await pool.execute(
