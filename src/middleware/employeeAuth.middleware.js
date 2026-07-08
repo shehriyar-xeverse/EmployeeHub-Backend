@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
-export const verifyToken = (req, res, next) => {
-  const token = req.cookies.adminToken;
+export const verifyTokenforEmployee = (req, res, next) => {
+  const token = req.cookies.employeeToken;
 
     if (!token) {
     return res.status(401).json({

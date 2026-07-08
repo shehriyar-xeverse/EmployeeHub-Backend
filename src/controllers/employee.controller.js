@@ -1,18 +1,18 @@
-import { AddEmployee,allEmployees,deleteEmployee,SingleEmployee ,updateEmployee} from "../models/employee.model.js";
+import { AddEmployee,allEmployees,createEmployeeReq,deleteEmployee,SingleEmployee ,updateEmployee} from "../models/employee.model.js";
 import {getIO} from '../config/socket.js'
 import { uploadToEmployeeImage } from "../utils/cloudinaryUpload.js";
+import { createNotification } from "../models/notification.model.js";
 
 
 export const createEmployee = async (req, res) => {
-  console.log("Request file from controller",req.file)
   try {
-    const { name,email,department,salary } = req.body;
+    const { name,email,department,salary,created_by_id,approved_by} = req.body;
     let employee_Image ; 
     const cloudinaryResponse = await uploadToEmployeeImage(req.file.buffer)
 
 
       employee_Image = cloudinaryResponse.secure_url;
-    const employee = await AddEmployee(name,email,department,salary, employee_Image)
+    const employee = await AddEmployee(name,email,department,salary, employee_Image,created_by_id,approved_by)
 
 
 
@@ -98,3 +98,30 @@ export const updateEmployeeController = async (req, res) => {
     console.log(error);
   }
 };
+
+
+// *************************** for Employees*********************************
+export const createEmployeeRequest = async(req,res)=>{
+
+try{
+    const{name,email,department,salary} = req.body;
+   const image = await uploadToEmployeeImage(req.file.buffer);
+  const employee=await createEmployeeReq({employee_profile_id:req.user.id,name,email,department,salary,
+          profile_image:image.secure_url, created_by_id:req.user.id});
+
+          console.log("employee from createEmployeeRequest",employee)
+
+  // notification
+  await createNotification({employee_id:employee.id,sender_id:req.user.id,title:"New Employee Request",message:`${employee.name} has requested to create an employee.`,name,email,department,salary,profile_image: image.secure_url });
+
+  //   req.io.to("admins").emit("newEmployeeRequest",{
+  //     notification:"New Employee Request",
+  //     employee});
+  //     return res.status(201).json({
+  //       success:true,
+  //       message:"Request Submitted Successfully"
+  //  });
+}catch(err){
+return res.status(500).json({
+message:err.message
+})}}

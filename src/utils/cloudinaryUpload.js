@@ -40,3 +40,21 @@ export const uploadToProfileImage = (buffer) => {
 
 
 
+
+
+
+export const uploadEmployeeProfileImage = (buffer) => {
+   return new Promise ((resolve,reject)  => {
+    const stream = cloudinary.uploader.upload_stream(
+        {folder : 'employeProfile_image'},
+        (error,result)  => {
+            if(error){
+                reject(error)
+            }else{
+                resolve(result)
+            }
+        }
+    )
+    streamifier.createReadStream(buffer).pipe(stream)
+   });
+}

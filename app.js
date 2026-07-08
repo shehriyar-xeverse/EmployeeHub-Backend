@@ -4,6 +4,8 @@ import dotenv from 'dotenv'
 import adminRouter from './src/routes/admin.router.js'
 import cookieParser from "cookie-parser"; 
 import employeeRouter from './src/routes/employee.router.js';
+import employeeProfileRouter from './src/routes/employeeProfile.router.js';
+import notificationRouter from './src/routes/notifications.router.js';
 dotenv.config()
 const app = express()
 
@@ -24,5 +26,7 @@ app.get('/', (req, res) => {
 
 app.use('/api', adminRouter)
 app.use('/api', employeeRouter)
+app.use('/api', employeeProfileRouter)
+app.use('/api', notificationRouter)
 
 export default app

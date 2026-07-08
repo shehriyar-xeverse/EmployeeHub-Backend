@@ -1,30 +1,27 @@
+import {signUpEmployee,findEmployeeByEmail,getEmployeeProfileModel,updateEmployeeProfile}  from '../models/employeeProfile.model.js'
+import { uploadEmployeeProfileImage, uploadToProfileImage } from '../utils/cloudinaryUpload.js';
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import {
-createAdmin,
-findAdminByEmail,
-getAllAdmins,
-getAdminProfileModel,
-updateProfile,
-} from "../models/admin.model.js";
-import { uploadToProfileImage } from "../utils/cloudinaryUpload.js";
 import {getIO} from '../config/socket.js'
 
 
-export const registerAdmin = async (req, res) => {
+
+
+
+export const signUpEmployeeController = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    const existingAdmin = await findAdminByEmail(email);
-    if (existingAdmin) {
+    const existingEmployee = await findEmployeeByEmail(email);
+    if (existingEmployee) {
       return res.status(400).json({
-        message: "user Already Exist",
+        message: "Employee Already Exist",
       });
     }
     const hashPassword = await bcrypt.hash(password, 10);
-    await createAdmin(name, email, hashPassword);
+    await signUpEmployee(name, email, hashPassword);
     res.status(201).json({
-      message: "user successfully Registered",
+      message: "Employee successfully Registered",
     });
   } catch (error) {
     res.status(500).json({
@@ -33,14 +30,14 @@ export const registerAdmin = async (req, res) => {
   }
 };
 
-export const loginAdmin = async (req, res) => {
+export const loginEmployeeController = async (req, res) => {
 
   try {
     const { email, password } = req.body;
-    const user = await findAdminByEmail(email);
+    const user = await findEmployeeByEmail(email);
     if (!user) {
       return res.status(404).json({
-        message: "user Not Found",
+        message: "employee Not Found",
       });
     }
 
@@ -62,7 +59,7 @@ export const loginAdmin = async (req, res) => {
       },
     );
 
-    res.cookie("adminToken", token, {
+    res.cookie("employeeToken", token, {
     httpOnly: true,
     secure: false,
     sameSite: "lax",
@@ -79,19 +76,9 @@ export const loginAdmin = async (req, res) => {
   }
 };
 
-export const getAdmins = async (req, res) => {
-  try {
-    const users = await getAllAdmins();
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
 
-export const logoutAdmin = (req, res) => {
-  res.clearCookie("adminToken", {
+export const logoutEmployeeController = (req, res) => {
+  res.clearCookie("employeeToken", {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
@@ -101,14 +88,14 @@ export const logoutAdmin = (req, res) => {
   });
 };
 
-export const getAdminProfile = async (req, res) => {
+export const getEmployeeProfileController = async (req, res) => {
     try {
         const userId = req.user.id;
-        const user = await getAdminProfileModel(userId);
+        const user = await getEmployeeProfileModel(userId);
         if (user.length === 0) {
             return res.status(404).json({
                 success: false,
-                message: "User not found"
+                message: "employee not found"
             });
         }
         return res.status(200).json({
@@ -126,21 +113,19 @@ export const getAdminProfile = async (req, res) => {
 
 };
 
-export const updateProfileImage = async (req, res) => {
+export const updateEmployeeProfileImageCont = async (req, res) => {
   try {
     const userId = req.user.id;
     if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: "Profile image is required",
+        message: "Employee Profile image is required",
       });
     }
     const result = await uploadToProfileImage(req.file.buffer);
     const profile_image = result.secure_url;
-    await updateProfile(userId, profile_image);
-    
-      // const io = getIO()
-      // io.emit("changeAdminImage", profile_image);
+    await updateEmployeeProfile(userId, profile_image);
+
 
 
     return res.status(200).json({
@@ -156,3 +141,50 @@ export const updateProfileImage = async (req, res) => {
     });
   }
 };
+
+
+export const createOwnEmployee = async (req,res) => {
+   try {
+      const { name,email,department,salary } = req.body;
+      let employee_Image ; 
+      const cloudinaryResponse = await uploadToEmployeeImage(req.file.buffer)
+      employee_Image = cloudinaryResponse.secure_url;
+
+
+      // send to notification to Admin 
+      
+
+
+
+      // const employee = await AddEmployee(name,email,department,salary, employee_Image)
+  
+  
+  
+        // const io = getIO()
+        // io.emit("employeeCreated", employee);
+  
+      res.status(201).json({
+        message: "Employee Successfully Created",
+        employee,
+        
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: error.message,
+      });
+    }
+}
+
+
+
+
+// export const getAllEmployeesController = async (req, res) => {
+//   try {
+//     const users = await getAllAdmins();
+//     res.json(users);
+//   } catch (error) {
+//     res.status(500).json({
+//       message: error.message,
+//     });
+//   }
+// };
