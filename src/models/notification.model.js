@@ -81,11 +81,11 @@ export const rejectEmployeeRequest = async (
         const employeeId = notification[0].employee_id;
         // Update Employee Status
         await connection.execute(`UPDATE employees SET  status = 'Rejected', approved_by = ?, 
-             approved_at = NOW() WHERE id = ? AND status = 'Pending'`,[adminId, employeeId]
+             approved_at = NOW() WHERE id = ? `,[adminId, employeeId]
         );
         const [employee] = await connection.execute( `SELECT * FROM employees WHERE id = ?`,[employeeId]
         );
-        // reject notification .. 
+        // reject 
         await connection.execute( `UPDATE notifications SET status = 'reject' WHERE id = ?`, [notificationId]);
         await connection.commit();
         return employee[0];

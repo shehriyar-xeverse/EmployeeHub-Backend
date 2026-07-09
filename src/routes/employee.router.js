@@ -1,5 +1,5 @@
 import express from "express";
-import {createEmployee,createEmployeeRequest,deleteEmployeeById,getAllEmployees,getSingleEmployee,updateEmployeeController} from "../controllers/employee.controller.js"
+import {createEmployee,createEmployeeRequest,deleteEmployeeById,deleteEmployeeReqById,getAllEmployees,getSingleEmployee,updateEmployeeController} from "../controllers/employee.controller.js"
 import { upload } from "../middleware/upload.js";
 import {verifyTokenforEmployee} from "../middleware/employeeAuth.middleware.js"
 
@@ -16,7 +16,6 @@ employeeRouter.put("/edit-employees/:id", updateEmployeeController);
 
 // for employee
 employeeRouter.post('/add-Employee-Req',verifyTokenforEmployee,   upload.single("employee_image") , createEmployeeRequest)
-
-
+employeeRouter.delete("/delete-EmployeeReq/:id",deleteEmployeeReqById)
 
 export default employeeRouter;

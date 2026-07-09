@@ -6,6 +6,7 @@ import { upload } from "../middleware/upload.js";
 
 import {signUpEmployeeController,loginEmployeeController,logoutEmployeeController,getEmployeeProfileController,updateEmployeeProfileImageCont} 
 from '../controllers/employeeProfile.controller.js'
+import { GetEmployeeRequest } from "../controllers/employee.controller.js";
 
 
 
@@ -15,5 +16,9 @@ employeeProfileRouter.post("/login-employee", loginEmployeeController);
 employeeProfileRouter.post("/logout-employee", logoutEmployeeController);
 employeeProfileRouter.get("/employee-profile", verifyTokenforEmployee, getEmployeeProfileController);
 employeeProfileRouter.put("/update-employee-profileImage",verifyTokenforEmployee, upload.single("profile_image"),updateEmployeeProfileImageCont);
+// get Employee Own Request
+employeeProfileRouter.get("/employee-Request", verifyTokenforEmployee, GetEmployeeRequest);
+
+
 
 export default employeeProfileRouter;

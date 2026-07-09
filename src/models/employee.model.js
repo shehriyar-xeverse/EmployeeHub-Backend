@@ -28,7 +28,7 @@ export const SingleEmployee = async (id) => {
 
 // get ALL employees
 export const allEmployees  = async  () => {
-    const sql = `SELECT * FROM employees`;
+    const sql = `SELECT * FROM employees  WHERE status = 'Approved'`;
     const [rows] = await pool.execute(sql)
     return  rows;
 }
@@ -89,6 +89,23 @@ export const createEmployeeReq = async ({employee_profile_id,name,email,
 
 }
 
+// Ftech Employee Own Req account
 
+export const GetEmployeeReq = async (userId) => {
+    const [rows] = await pool.query(
+        `SELECT * FROM employees WHERE employee_profile_id = ?`,
+        [userId]
+    );
+    return rows;
+}
 
  
+// Delete Employees Request which admin Reject 
+export const deleteEmployeeReq = async (id) => {
+     await pool.execute(
+        `DELETE FROM employees WHERE id = ?`,
+        [id]
+    );
+
+    return Number(id);
+}
