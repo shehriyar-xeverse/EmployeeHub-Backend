@@ -139,8 +139,8 @@ export const updateProfileImage = async (req, res) => {
     const profile_image = result.secure_url;
     await updateProfile(userId, profile_image);
     
-      // const io = getIO()
-      // io.emit("changeAdminImage", profile_image);
+      const io = getIO()
+      io.emit("chngAdminProfileImage", profile_image);
 
 
     return res.status(200).json({

@@ -17,7 +17,15 @@ export const createNotification = async ({
     const sql=`
     INSERT INTO notifications(employee_id,sender_type,sender_id,receiver_type,title,message,name,email,department,salary,profile_image)
     VALUES(?,?,?,?,?,?,?,?,?,?,?)`;
-    await pool.execute(sql,[employee_id,"employee",sender_id,"admin",title,message,name,email,department,salary,profile_image]);
+    const [result]  = await pool.execute(sql,[employee_id,"employee",sender_id,"admin",title,message,name,email,department,salary,profile_image]);
+
+
+    const [rows] = await pool.execute(
+        "SELECT * FROM notifications  WHERE id=?",
+        [result.insertId]
+    );
+
+    return rows[0];
 }
 
 
@@ -53,7 +61,10 @@ export const approveEmployeeRequest = async (
         const [employee] = await connection.execute(`SELECT * FROM employees WHERE id = ?`,[employeeId]
         );
         await connection.commit();
-        return employee[0];
+            return {
+                employee: employee[0],
+                notificationId
+            };
     } catch (err) {
         await connection.rollback();
         throw err;
@@ -88,7 +99,10 @@ export const rejectEmployeeRequest = async (
         // reject 
         await connection.execute( `UPDATE notifications SET status = 'reject' WHERE id = ?`, [notificationId]);
         await connection.commit();
-        return employee[0];
+        return {
+                employee: employee[0],
+                notificationId
+            };
     } catch (err) {
         await connection.rollback();
         throw err;

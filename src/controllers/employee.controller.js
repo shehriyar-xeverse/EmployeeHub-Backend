@@ -134,7 +134,6 @@ export const createEmployeeRequest = async (req, res) => {
       profile_image: image.secure_url,
     });
 
-      //  console.log("notification from createEmployeeRequest",notification)
         const io = getIO();
         io.emit("reqEmployee", { employee, notification });
 
@@ -153,18 +152,13 @@ export const GetEmployeeRequest = async (req, res) => {
   try {
     const userId = req.user.id;
     const user = await GetEmployeeReq(userId);
-    if (user.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "employee not found",
-      });
-    }
 
     return res.status(200).json({
       success: true,
       message: "Profile fetched successfully",
-      data: user[0],
+      data: user.length > 0 ? user[0] : null,
     });
+
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -190,3 +184,6 @@ export const deleteEmployeeReqById = async (req, res) => {
     });
   }
 };
+
+
+

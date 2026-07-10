@@ -1,4 +1,6 @@
 import { approveEmployeeRequest, getNotifications, rejectEmployeeRequest } from "../models/notification.model.js";
+import { getIO } from "../config/socket.js";
+
 
 
 export const getAllNotifications = async (req, res) => {
@@ -17,16 +19,17 @@ export const approveNotification = async (req, res) => {
     try {
         const  notificationId  = req.body.id;
         const adminId = req.user.id;
-        const employee = await approveEmployeeRequest(notificationId,adminId);
-        // req.io
-        //     .to(`employee-${employee.employee_profile_id}`)
-        //     .emit("employeeApproved", {
-        //         employee
-        //     });
+        const result = await approveEmployeeRequest(notificationId, adminId);
+
+
+
+        const io = getIO();
+        io.emit("approveNotif",  result);
+       
         return res.status(200).json({
             success: true,
             message: "Employee Approved Successfully",
-            employee
+            result
           });
     } catch (err) {
         return res.status(500).json({
@@ -46,15 +49,14 @@ export const rejectNotification = async (req, res) => {
         const  notificationId  = req.body.id;
         const adminId = req.user.id;
 
-        const employee = await rejectEmployeeRequest(
+        const result = await rejectEmployeeRequest(
             notificationId,
             adminId
         );
-        // req.io
-        //     .to(`employee-${employee.employee_profile_id}`)
-        //     .emit("employeeRejected", {
-        //         employee
-        //     });
+        
+         const io = getIO();
+        io.emit("rejectNotif",  result);
+
 
         return res.status(200).json({
             success: true,

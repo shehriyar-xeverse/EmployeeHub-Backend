@@ -126,7 +126,8 @@ export const updateEmployeeProfileImageCont = async (req, res) => {
     const profile_image = result.secure_url;
     await updateEmployeeProfile(userId, profile_image);
 
-
+    const io = getIO()
+    io.emit("chngEmpProfileImage", profile_image);
 
     return res.status(200).json({
       success: true,
@@ -148,21 +149,7 @@ export const createOwnEmployee = async (req,res) => {
       const { name,email,department,salary } = req.body;
       let employee_Image ; 
       const cloudinaryResponse = await uploadToEmployeeImage(req.file.buffer)
-      employee_Image = cloudinaryResponse.secure_url;
-
-
-      // send to notification to Admin 
-      
-
-
-
-      // const employee = await AddEmployee(name,email,department,salary, employee_Image)
-  
-  
-  
-        // const io = getIO()
-        // io.emit("employeeCreated", employee);
-  
+      employee_Image = cloudinaryResponse.secure_url;  
       res.status(201).json({
         message: "Employee Successfully Created",
         employee,
