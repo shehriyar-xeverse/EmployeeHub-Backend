@@ -26,12 +26,12 @@ export const getEmployeeProfileModel = async (userId) => {
 }
 
 
-export const updateEmployeeProfile = async (userId, profile_image) => {
+export const updateEmployeeProfile = async (userId, profile_image,publicId) => {
   const sql = `
     UPDATE employee_profile
-    SET profile_image = ?
+    SET profile_image = ?, public_id = ?
     WHERE id = ?
   `;
-  const [result] = await pool.execute(sql, [profile_image, userId]);
+  const [result] = await pool.execute(sql, [profile_image, publicId, userId]);
   return result;
 };

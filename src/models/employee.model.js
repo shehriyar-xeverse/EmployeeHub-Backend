@@ -2,12 +2,12 @@ import { pool } from "../config/db.js";
 
 
 // add emplyee 
-export const AddEmployee = async (name,email,department,salary,employee_image,created_by_id,approved_by) => {
+export const AddEmployee = async (name,email,department,salary,employee_image,created_by_id,approved_by,publicId) => {
     const sql = `INSERT  INTO employees 
-    (name,email,department,salary,profile_image,status,created_by_type,created_by_id, approved_by) 
-    VALUES (?, ?, ?,?,?,?,?,?,?)`;
+    (name,email,department,salary,profile_image,status,created_by_type,created_by_id, approved_by,public_id) 
+    VALUES (?, ?, ?,?,?,?,?,?,?,?)`;
     const [result] = await pool.execute(sql,[name,email,department,salary,employee_image, "Approved",
-        "admin",created_by_id,approved_by])
+        "admin",created_by_id,approved_by,publicId])
 
 
     const [rows] = await pool.execute(
@@ -71,14 +71,15 @@ export const updateEmployee = async (id, data) => {
 
 //create Employee Account  Request  
 export const createEmployeeReq = async ({employee_profile_id,name,email,
-    department,salary,profile_image,created_by_id}) => {``
+    department,salary,profile_image,created_by_id,publicId}) => {``
     const sql = `INSERT INTO employees
-        (employee_profile_id,name,email,department,salary,profile_image,status,created_by_type,created_by_id)
-        VALUES (?,?,?,?,?,?,?,?,?)`;
+        (employee_profile_id,name,email,department,salary,profile_image,status,created_by_type,created_by_id,public_id)
+        VALUES (?,?,?,?,?,?,?,?,?,?)`;
     const [result] = await pool.execute(sql,[employee_profile_id,name,email,department,salary,profile_image,
         "Pending",
         "employee",
-        created_by_id
+        created_by_id,
+        publicId
     ]);
     const [rows] = await pool.execute(
         "SELECT * FROM employees WHERE id=?",

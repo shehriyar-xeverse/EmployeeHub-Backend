@@ -1,5 +1,5 @@
 import {signUpEmployee,findEmployeeByEmail,getEmployeeProfileModel,updateEmployeeProfile}  from '../models/employeeProfile.model.js'
-import { uploadEmployeeProfileImage, uploadToProfileImage } from '../utils/cloudinaryUpload.js';
+import { deleteEmployeeProfileImage, deleteOldImage, uploadEmployeeProfileImage, uploadToProfileImage } from '../utils/cloudinaryUpload.js';
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import {getIO} from '../config/socket.js'
@@ -123,8 +123,12 @@ export const updateEmployeeProfileImageCont = async (req, res) => {
       });
     }
     const result = await uploadToProfileImage(req.file.buffer);
+    const publicId = result.public_id;
+    
+    await deleteEmployeeProfileImage(userId)
+
     const profile_image = result.secure_url;
-    await updateEmployeeProfile(userId, profile_image);
+    await updateEmployeeProfile(userId, profile_image,publicId);
 
     const io = getIO()
     io.emit("chngEmpProfileImage", profile_image);
@@ -161,17 +165,3 @@ export const createOwnEmployee = async (req,res) => {
       });
     }
 }
-
-
-
-
-// export const getAllEmployeesController = async (req, res) => {
-//   try {
-//     const users = await getAllAdmins();
-//     res.json(users);
-//   } catch (error) {
-//     res.status(500).json({
-//       message: error.message,
-//     });
-//   }
-// };

@@ -13,9 +13,8 @@ import {
 } from "../middleware/auth.middleware.js";
 import { upload } from "../middleware/upload.js";
 
-
 const adminRouter = express.Router();
-adminRouter.post("/register-Admin",registerAdmin);
+adminRouter.post("/register-Admin",  registerAdmin);
 adminRouter.post("/login-Admin", loginAdmin);
 adminRouter.post("/logout-Admin", logoutAdmin);
 adminRouter.get( "/admins",verifyToken,getAdmins);

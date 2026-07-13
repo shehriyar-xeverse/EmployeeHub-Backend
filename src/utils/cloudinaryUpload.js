@@ -1,5 +1,7 @@
 import {cloudinary} from '../config/cloudinary.js'
 import streamifier from 'streamifier'
+import { pool } from "../config/db.js";
+
 
 
 export const uploadToEmployeeImage = (buffer) => {
@@ -19,7 +21,6 @@ export const uploadToEmployeeImage = (buffer) => {
    });
 }
 
-
 export const uploadToProfileImage = (buffer) => {
    return new Promise ((resolve,reject)  => {
     const stream = cloudinary.uploader.upload_stream(
@@ -36,11 +37,19 @@ export const uploadToProfileImage = (buffer) => {
    });
 }
 
+export const deleteOldImage =   async (userId) => {
+    const [FetchProfile]  =  await pool.execute(`SELECT * FROM admins WHERE id = ?`, [userId]);
+    const  oldPublicId = FetchProfile[0].public_id
+    const deleteImage =     await cloudinary.uploader.destroy(oldPublicId);
+    return deleteImage;
+}
 
-
-
-
-
+export const deleteEmployeeProfileImage =   async (userId) => {
+    const [FetchProfile]  =  await pool.execute(`SELECT * FROM employee_profile WHERE id = ?`, [userId]);
+    const  oldPublicId = FetchProfile[0].public_id
+    const deleteImage =     await cloudinary.uploader.destroy(oldPublicId);
+    return deleteImage;
+}
 
 
 export const uploadEmployeeProfileImage = (buffer) => {
@@ -57,4 +66,14 @@ export const uploadEmployeeProfileImage = (buffer) => {
     )
     streamifier.createReadStream(buffer).pipe(stream)
    });
+}
+
+
+
+
+export const deleteEmployeeImage =   async (userId) => {
+    const [FetchProfile]  =  await pool.execute(`SELECT * FROM employees WHERE id = ?`, [userId]);
+    const  oldPublicId = FetchProfile[0].public_id
+    const deleteImage =     await cloudinary.uploader.destroy(oldPublicId);
+    return deleteImage;
 }

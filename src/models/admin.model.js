@@ -1,10 +1,9 @@
 import { pool } from "../config/db.js";
 
-
 // creat user  
 export const createAdmin = async (name,email,password) => {
-    const sql = `INSERT INTO admins(name, email, password) VALUES (?, ?, ?)`;
-    const [result] = await pool.execute(sql,[name,email,password])
+    const sql = `INSERT INTO admins (name, email, password) VALUES (?, ?, ?)`;
+    const [result] = await pool.execute(sql,[name,email,password,role])
     return result;
 }
 
@@ -34,12 +33,11 @@ export const getAdminProfileModel = async (userId) => {
 };
 
 
-export const updateProfile = async (userId, profile_image) => {
-  const sql = `
+export const updateProfile = async (userId, profile_image, publicId) => {
+    const sql = `
     UPDATE admins
-    SET profile_image = ?
-    WHERE id = ?
-  `;
-  const [result] = await pool.execute(sql, [profile_image, userId]);
+    SET profile_image = ?, public_id = ?
+    WHERE id = ?`;
+  const [result] = await pool.execute(sql, [profile_image,publicId,  userId]);
   return result;
 };

@@ -7,13 +7,13 @@ getAllAdmins,
 getAdminProfileModel,
 updateProfile,
 } from "../models/admin.model.js";
-import { uploadToProfileImage } from "../utils/cloudinaryUpload.js";
+import { deleteOldImage, uploadToProfileImage } from "../utils/cloudinaryUpload.js";
 import {getIO} from '../config/socket.js'
 
 
 export const registerAdmin = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password} = req.body;
 
     const existingAdmin = await findAdminByEmail(email);
     if (existingAdmin) {
@@ -136,8 +136,12 @@ export const updateProfileImage = async (req, res) => {
       });
     }
     const result = await uploadToProfileImage(req.file.buffer);
+    const publicId = result.public_id
+    await deleteOldImage(userId)
+    
+    
     const profile_image = result.secure_url;
-    await updateProfile(userId, profile_image);
+    await updateProfile(userId, profile_image,publicId);
     
       const io = getIO()
       io.emit("chngAdminProfileImage", profile_image);

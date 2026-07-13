@@ -9,7 +9,7 @@ import {
   updateEmployee,
 } from "../models/employee.model.js";
 import { getIO } from "../config/socket.js";
-import { uploadToEmployeeImage } from "../utils/cloudinaryUpload.js";
+import { deleteEmployeeImage, uploadToEmployeeImage } from "../utils/cloudinaryUpload.js";
 import { createNotification } from "../models/notification.model.js";
 
 export const createEmployee = async (req, res) => {
@@ -18,6 +18,9 @@ export const createEmployee = async (req, res) => {
       req.body;
     let employee_Image;
     const cloudinaryResponse = await uploadToEmployeeImage(req.file.buffer);
+    const publicId = cloudinaryResponse.public_id
+
+    
 
     employee_Image = cloudinaryResponse.secure_url;
     const employee = await AddEmployee(
@@ -28,6 +31,7 @@ export const createEmployee = async (req, res) => {
       employee_Image,
       created_by_id,
       approved_by,
+      publicId
     );
 
     const io = getIO();
@@ -77,6 +81,7 @@ export const getAllEmployees = async (req, res) => {
 export const deleteEmployeeById = async (req, res) => {
   try {
     const { id } = req.params;
+    await deleteEmployeeImage(id)
     const deletedId = await deleteEmployee(id);
     const io = getIO();
     io.emit("deleteEmployee", deletedId);
@@ -112,13 +117,14 @@ export const createEmployeeRequest = async (req, res) => {
     const { name, email, department, salary } = req.body;
     const image = await uploadToEmployeeImage(req.file.buffer);
     const employee = await createEmployeeReq({
-      employee_profile_id: req.user.id,
+      employee_profile_id: req.user.id, 
       name,
       email,
       department,
       salary,
       profile_image: image.secure_url,
       created_by_id: req.user.id,
+      publicId : image.public_id,
     });
 
     // notification
