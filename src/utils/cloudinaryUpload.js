@@ -37,6 +37,22 @@ export const uploadToProfileImage = (buffer) => {
    });
 }
 
+
+export const  uploadfile = (fileBuffer) =>  {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: 'employees_files', resource_type: 'auto' },
+      (error, result) => {
+        if (result) resolve(result);
+        else reject(error);
+      }
+    );
+    streamifier.createReadStream(fileBuffer).pipe(stream);
+  });
+}
+
+  
+
 export const deleteOldImage =   async (userId) => {
     const [FetchProfile]  =  await pool.execute(`SELECT * FROM admins WHERE id = ?`, [userId]);
     const  oldPublicId = FetchProfile[0].public_id
@@ -77,3 +93,6 @@ export const deleteEmployeeImage =   async (userId) => {
     const deleteImage =     await cloudinary.uploader.destroy(oldPublicId);
     return deleteImage;
 }
+
+
+

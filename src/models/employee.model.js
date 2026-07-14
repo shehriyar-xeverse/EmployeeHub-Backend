@@ -90,14 +90,16 @@ export const createEmployeeReq = async ({employee_profile_id,name,email,
 
 }
 
-// Ftech Employee Own Req account
+// Fetch Employee Own Req account
 
 export const GetEmployeeReq = async (userId) => {
-    const [rows] = await pool.query(
-        `SELECT * FROM employees WHERE employee_profile_id = ?`,
-        [userId]
-    );
-    return rows;
+    // const sql = `SELECT * FROM employees where  employee_profile_id = ? `
+    const sql = `SELECT * FROM employees  INNER JOIN employee_files ON employee_files.id WHERE employee_profile_id = ?`
+    const [result] = await pool.query(sql,[userId]);
+
+
+
+    return result;  
 }
 
  

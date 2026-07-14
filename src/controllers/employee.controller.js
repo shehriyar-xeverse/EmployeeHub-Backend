@@ -9,8 +9,9 @@ import {
   updateEmployee,
 } from "../models/employee.model.js";
 import { getIO } from "../config/socket.js";
-import { deleteEmployeeImage, uploadToEmployeeImage } from "../utils/cloudinaryUpload.js";
+import { deleteEmployeeImage, uploadfile, uploadToEmployeeImage } from "../utils/cloudinaryUpload.js";
 import { createNotification } from "../models/notification.model.js";
+import { uploadEmployeesFiles } from "../models/employee_files.model.js";
 
 export const createEmployee = async (req, res) => {
   try {
@@ -115,8 +116,15 @@ export const updateEmployeeController = async (req, res) => {
 export const createEmployeeRequest = async (req, res) => {
   try {
     const { name, email, department, salary } = req.body;
-    const image = await uploadToEmployeeImage(req.file.buffer);
-    const employee = await createEmployeeReq({
+    const imageBuffer = req.files.employee_image[0].buffer;
+    const fileBuffer = req.files.file[0].buffer;
+    const fileName = req.files.file[0].originalname;
+    const fileType = req.files.file[0].mimetype;
+    const image = await uploadToEmployeeImage(imageBuffer);
+    const file = await uploadfile(fileBuffer) 
+
+  
+    const employee = await createEmployeeReq({  
       employee_profile_id: req.user.id, 
       name,
       email,
@@ -140,8 +148,20 @@ export const createEmployeeRequest = async (req, res) => {
       profile_image: image.secure_url,
     });
 
-        const io = getIO();
-        io.emit("reqEmployee", { employee, notification });
+
+      const employee_file = await uploadEmployeesFiles({
+      employee_id :  employee.id,
+      notification_id: notification.id,
+      file_name : fileName,
+      file_url  : file.secure_url,
+      public_id : file.public_id,
+      file_type : fileType,
+      uploaded_by : req.user.id,
+    })
+    
+
+    const io = getIO();
+    io.emit("reqEmployee", { employee, notification });
 
     return res.status(201).json({
       success: true,
