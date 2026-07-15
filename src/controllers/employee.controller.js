@@ -9,9 +9,10 @@ import {
   updateEmployee,
 } from "../models/employee.model.js";
 import { getIO } from "../config/socket.js";
-import { deleteEmployeeImage, uploadfile, uploadToEmployeeImage } from "../utils/cloudinaryUpload.js";
+import { deleteEmployeefile, deleteEmployeeImage, uploadfile, uploadToEmployeeImage } from "../utils/cloudinaryUpload.js";
 import { createNotification } from "../models/notification.model.js";
 import { uploadEmployeesFiles } from "../models/employee_files.model.js";
+ import fs from "fs";
 
 export const createEmployee = async (req, res) => {
   try {
@@ -83,6 +84,7 @@ export const deleteEmployeeById = async (req, res) => {
   try {
     const { id } = req.params;
     await deleteEmployeeImage(id)
+    await deleteEmployeefile(id)
     const deletedId = await deleteEmployee(id);
     const io = getIO();
     io.emit("deleteEmployee", deletedId);
@@ -121,7 +123,11 @@ export const createEmployeeRequest = async (req, res) => {
     const fileName = req.files.file[0].originalname;
     const fileType = req.files.file[0].mimetype;
     const image = await uploadToEmployeeImage(imageBuffer);
-    const file = await uploadfile(fileBuffer) 
+    const file = await uploadfile(fileBuffer,fileName) 
+
+
+    console.log(file, "file")
+   
 
   
     const employee = await createEmployeeReq({  
@@ -133,7 +139,11 @@ export const createEmployeeRequest = async (req, res) => {
       profile_image: image.secure_url,
       created_by_id: req.user.id,
       publicId : image.public_id,
+      employee_file :file.secure_url,
+      file_public_id : file.public_id,
     });
+
+
 
     // notification
     const notification = await createNotification({
@@ -146,22 +156,15 @@ export const createEmployeeRequest = async (req, res) => {
       department,
       salary,
       profile_image: image.secure_url,
+      employee_file :file.secure_url,
     });
 
 
-      const employee_file = await uploadEmployeesFiles({
-      employee_id :  employee.id,
-      notification_id: notification.id,
-      file_name : fileName,
-      file_url  : file.secure_url,
-      public_id : file.public_id,
-      file_type : fileType,
-      uploaded_by : req.user.id,
-    })
-    
+
+   
 
     const io = getIO();
-    io.emit("reqEmployee", { employee, notification });
+    io.emit("reqEmployee", { employee,notification  });
 
     return res.status(201).json({
       success: true,

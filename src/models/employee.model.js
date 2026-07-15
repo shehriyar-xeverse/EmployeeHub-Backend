@@ -71,15 +71,18 @@ export const updateEmployee = async (id, data) => {
 
 //create Employee Account  Request  
 export const createEmployeeReq = async ({employee_profile_id,name,email,
-    department,salary,profile_image,created_by_id,publicId}) => {``
+    department,salary,profile_image,created_by_id,publicId,  employee_file,file_public_id}) => {``
     const sql = `INSERT INTO employees
-        (employee_profile_id,name,email,department,salary,profile_image,status,created_by_type,created_by_id,public_id)
-        VALUES (?,?,?,?,?,?,?,?,?,?)`;
+        (employee_profile_id,name,email,department,salary,profile_image,status,created_by_type,
+        created_by_id,public_id,employee_file,file_public_id)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`;
     const [result] = await pool.execute(sql,[employee_profile_id,name,email,department,salary,profile_image,
         "Pending",
         "employee",
         created_by_id,
-        publicId
+        publicId,
+        employee_file,
+        file_public_id
     ]);
     const [rows] = await pool.execute(
         "SELECT * FROM employees WHERE id=?",
@@ -91,14 +94,9 @@ export const createEmployeeReq = async ({employee_profile_id,name,email,
 }
 
 // Fetch Employee Own Req account
-
 export const GetEmployeeReq = async (userId) => {
-    // const sql = `SELECT * FROM employees where  employee_profile_id = ? `
-    const sql = `SELECT * FROM employees  INNER JOIN employee_files ON employee_files.id WHERE employee_profile_id = ?`
+    const sql = `SELECT * FROM employees WHERE employee_profile_id = ?`
     const [result] = await pool.query(sql,[userId]);
-
-
-
     return result;  
 }
 

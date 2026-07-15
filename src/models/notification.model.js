@@ -12,12 +12,14 @@ export const createNotification = async ({
     email,
     department,
     salary,
-    profile_image
+    profile_image,
+    employee_file,
 })=>{
     const sql=`
-    INSERT INTO notifications(employee_id,sender_type,sender_id,receiver_type,title,message,name,email,department,salary,profile_image)
-    VALUES(?,?,?,?,?,?,?,?,?,?,?)`;
-    const [result]  = await pool.execute(sql,[employee_id,"employee",sender_id,"admin",title,message,name,email,department,salary,profile_image]);
+    INSERT INTO notifications(employee_id,sender_type,sender_id,receiver_type,title,message,
+    name,email,department,salary,profile_image, employee_file)
+    VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`;
+    const [result]  = await pool.execute(sql,[employee_id,"employee",sender_id,"admin",title,message,name,email,department,salary,profile_image, employee_file]);
 
 
     const [rows] = await pool.execute(

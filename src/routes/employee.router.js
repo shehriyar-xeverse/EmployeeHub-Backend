@@ -15,11 +15,16 @@ employeeRouter.put("/edit-employees/:id", updateEmployeeController);
 
 
 // for employee
+
+
 employeeRouter.post('/add-Employee-Req',verifyTokenforEmployee,
       upload.fields([
         { name: "employee_image", maxCount: 1 },
         { name: "file", maxCount: 1 }
     ]), createEmployeeRequest)
-employeeRouter.delete("/delete-EmployeeReq/:id",deleteEmployeeReqById)
+
+
+    employeeRouter.delete("/delete-EmployeeReq/:id",deleteEmployeeReqById)
+
 
 export default employeeRouter;

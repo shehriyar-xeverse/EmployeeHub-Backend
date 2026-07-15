@@ -5,7 +5,7 @@ export const uploadEmployeesFiles = async ({employee_id,notification_id,file_nam
    
     
     const sql = `INSERT INTO employee_files
-        (employee_id,notification_id,file_name,file_url,public_id,file_type,uploaded_by)
+        (employee_id,notification_id,file_name,file_url,file_public_id,file_type,uploaded_by)
         VALUES (?,?,?,?,?,?,?)`;
 
         
@@ -18,3 +18,11 @@ export const uploadEmployeesFiles = async ({employee_id,notification_id,file_nam
 
     return rows[0];
 }
+
+
+// export const eployeesFiles = async ({userId}) => {
+//     const sql = `SELECT * FROM  employee_files WHERE employee_id =  ?`
+
+//     const [result] = pool.execute(sql,[userId])
+//     return result;
+// }
