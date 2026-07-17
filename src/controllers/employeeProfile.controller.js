@@ -58,11 +58,12 @@ export const loginEmployeeController = async (req, res) => {
         expiresIn: process.env.JWT_EXPIRES_IN,
       },
     );
+    const isProduction = process.env.NODE_ENV === "production";
 
     res.cookie("employeeToken", token, {
     httpOnly: true,
-    secure: false,
-    sameSite: "strict",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
     maxAge: 24 * 60 * 60 * 1000,
       });
     res.status(200).json({

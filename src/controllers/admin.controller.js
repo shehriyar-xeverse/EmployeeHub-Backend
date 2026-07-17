@@ -62,11 +62,13 @@ export const loginAdmin = async (req, res) => {
       },
     );
 
+    const isProduction = process.env.NODE_ENV === "production";
+
     res.cookie("adminToken", token, {
-    httpOnly: true,
-    secure: false,
-    sameSite: "strict",
-    maxAge: 24 * 60 * 60 * 1000,
+     httpOnly: true,
+  secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+  maxAge: 24 * 60 * 60 * 1000,
       });
     res.status(200).json({
       message: "Login Successful",
