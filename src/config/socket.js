@@ -5,6 +5,7 @@ export const initSocket = (server) => {
    io = new Server (server, {
     cors : {
         origin : process.env.NEXT_PUBLIC_FRONTEND_URL,
+        methods: ["GET", "POST", "PUT", "DELETE"],
         credentials : true,
     }
    });
