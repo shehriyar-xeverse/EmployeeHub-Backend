@@ -62,7 +62,7 @@ export const loginEmployeeController = async (req, res) => {
     res.cookie("employeeToken", token, {
     httpOnly: true,
     secure: false,
-    sameSite: "lax",
+    sameSite: "strict",
     maxAge: 24 * 60 * 60 * 1000,
       });
     res.status(200).json({
