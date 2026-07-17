@@ -124,12 +124,7 @@ export const createEmployeeRequest = async (req, res) => {
     const fileType = req.files.file[0].mimetype;
     const image = await uploadToEmployeeImage(imageBuffer);
     const file = await uploadfile(fileBuffer,fileName) 
-
-
-    console.log(file, "file")
    
-
-  
     const employee = await createEmployeeReq({  
       employee_profile_id: req.user.id, 
       name,
