@@ -62,9 +62,9 @@ export const loginEmployeeController = async (req, res) => {
 
     res.cookie("employeeToken", token, {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? "none" : "lax",
-    maxAge: 24 * 60 * 60 * 1000,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'None',
+    maxAge: 7 * 24 * 60 * 60 * 1000
       });
     res.status(200).json({
       message: "Login Successful",
@@ -79,11 +79,12 @@ export const loginEmployeeController = async (req, res) => {
 
 
 export const logoutEmployeeController = (req, res) => {
-  res.clearCookie("employeeToken", {
+    res.cookie("employeeToken", token, {
     httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-});
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'None',
+    maxAge: 7 * 24 * 60 * 60 * 1000
+    })
   res.status(200).json({
     message: "Logout Successful",
   });
