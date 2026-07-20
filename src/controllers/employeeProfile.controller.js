@@ -61,9 +61,9 @@ export const loginEmployeeController = async (req, res) => {
     const isProduction = process.env.NODE_ENV === "production";
 
     res.cookie("employeeToken", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'None',
+    httpOnly: isProduction,
+    secure: isProduction,
+    sameSite: isProduction ? 'None'  : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000
       });
     res.status(200).json({
@@ -79,10 +79,11 @@ export const loginEmployeeController = async (req, res) => {
 
 
 export const logoutEmployeeController = (req, res) => {
-    res.cookie("employeeToken", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'None',
+  const isProduction = process.env.NODE_ENV === "production";
+    res.clearCookie("employeeToken", token, {
+    httpOnly: isProduction,
+    secure: isProduction,
+    sameSite: isProduction ? 'None'  : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000
     })
   res.status(200).json({
