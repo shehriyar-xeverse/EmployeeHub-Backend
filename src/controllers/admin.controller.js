@@ -9,6 +9,10 @@ updateProfile,
 } from "../models/admin.model.js";
 import { deleteOldImage, uploadToProfileImage } from "../utils/cloudinaryUpload.js";
 import {getIO} from '../config/socket.js'
+import { Resend } from "resend";
+import { sendOTP } from "../services/sendOTP.js";
+import { transporter } from "../services/mailService.js";
+
 
 
 export const registerAdmin = async (req, res) => {
@@ -23,6 +27,56 @@ export const registerAdmin = async (req, res) => {
     }
     const hashPassword = await bcrypt.hash(password, 10);
     await createAdmin(name, email, hashPassword);
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+
+
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 40px; }
+        .container { max-width: 450px; margin: 0 auto; background: #ffffff; border-radius: 8px; padding: 40px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h2 { color: #333; margin-bottom: 15px; }
+        p { color: #666; font-size: 15px; line-height: 24px; }
+        .otp-code { display: inline-block; background: #eef2f6; color: #00466a; padding: 15px 30px; font-size: 28px; font-weight: bold; letter-spacing: 6px; border-radius: 5px; margin: 25px 0; }
+        .footer { color: #aaa; font-size: 12px; margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h2>Email Verification</h2>
+        <p>Enter this verification code to complete your signup.</p>
+        <div class="otp-code">${otp}</div>
+        <p>This code expires in 10 minutes. Do not share this code with anyone.</p>
+        <div class="footer">This is an automated message, please do not reply.</div>
+      </div>
+    </body>
+    </html>
+  `;
+     const mailOptions = {
+    from: "employeehub.hr@gmail.com",
+    to: email,
+    subject: "Email Verfiication",
+    text: `Your OTP code is ${otp}. It is valid for 2 minutes.`,
+     html: htmlContent
+  };
+   transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error("Error sending email  from register Admin: ", error);
+      res.status(500).send("Error sending email");
+    } else {
+      console.log("Email sent from register Admin", info.response);
+      res.send("Email sent successfully");
+    }
+  });
+
+
+
+
+
+    
     res.status(201).json({
       message: "user successfully Registered",
     });
@@ -149,9 +203,9 @@ export const updateProfileImage = async (req, res) => {
       io.emit("chngAdminProfileImage", profile_image);
 
 
-    return res.status(200).json({
-      success: true,
-      message: "Profile image updated successfully",
+      return res.status(200).json({
+        success: true,
+        message: "Profile image updated successfully",
       profile_image: profile_image,
     });
   } catch (error) {
@@ -162,3 +216,4 @@ export const updateProfileImage = async (req, res) => {
     });
   }
 };
+

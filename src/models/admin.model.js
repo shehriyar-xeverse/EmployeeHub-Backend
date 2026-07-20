@@ -3,7 +3,7 @@ import { pool } from "../config/db.js";
 // creat user  
 export const createAdmin = async (name,email,password) => {
     const sql = `INSERT INTO admins (name, email, password) VALUES (?, ?, ?)`;
-    const [result] = await pool.execute(sql,[name,email,password,role])
+    const [result] = await pool.execute(sql,[name,email,password])
     return result;
 }
 
@@ -22,7 +22,7 @@ export const getAllAdmins  = async  () => {
     return  rows;
 }
 
-// get Profile 
+// get Profile w
 export const getAdminProfileModel = async (userId) => {
     const [rows] = await pool.query(
         `SELECT * FROM admins WHERE id = ?`,
