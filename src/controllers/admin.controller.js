@@ -10,7 +10,7 @@ updateProfile,
 import { deleteOldImage, uploadToProfileImage } from "../utils/cloudinaryUpload.js";
 import {getIO} from '../config/socket.js'
 import { Resend } from "resend";
-import { sendOTP } from "../services/sendOTP.js";
+// import { sendOTP } from "../services/sendOTP.js";
 import { transporter } from "../services/mailService.js";
 
 
