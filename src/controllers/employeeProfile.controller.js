@@ -79,8 +79,7 @@ export const loginEmployeeController = async (req, res) => {
 
 
 export const logoutEmployeeController = (req, res) => {
-  const isProduction = process.env.NODE_ENV === "production";
-    res.clearCookie("employeeToken", token, {
+    res.clearCookie("employeeToken", {
     httpOnly: false,
     secure: false,
     sameSite:  'lax'
