@@ -94,9 +94,9 @@ export const getAdmins = async (req, res) => {
 
 export const logoutAdmin = (req, res) => {
   res.clearCookie("adminToken", {
-    httpOnly: isProduction,
-    secure: isProduction,
-    sameSite: isProduction ? 'None'  : 'lax',
+    httpOnly: false,
+    secure: false,
+    sameSite:  'lax',
 });
   res.status(200).json({
     message: "Logout Successful",
