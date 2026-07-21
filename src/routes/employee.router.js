@@ -3,9 +3,6 @@ import {createEmployee,createEmployeeRequest,deleteEmployeeById,deleteEmployeeRe
 import { upload } from "../middleware/upload.js";
 import {verifyTokenforEmployee} from "../middleware/employeeAuth.middleware.js"
 
-
-
-
 const employeeRouter = express.Router();
 employeeRouter.post('/add-Employee',upload.single("employee_image") , createEmployee)
 employeeRouter.get('/getSingle-Employee/:id', getSingleEmployee)
@@ -15,8 +12,6 @@ employeeRouter.put("/edit-employees/:id", updateEmployeeController);
 
 
 // for employee
-
-
 employeeRouter.post('/add-Employee-Req',verifyTokenforEmployee,
       upload.fields([
         { name: "employee_image", maxCount: 1 },

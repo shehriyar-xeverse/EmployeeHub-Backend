@@ -1,12 +1,12 @@
 import express from "express";
-
 import {
   registerAdmin,
   loginAdmin,
   getAdmins,
   logoutAdmin,
   getAdminProfile,
-  updateProfileImage
+  updateProfileImage,
+  verifiedOTP
 } from "../controllers/admin.controller.js";
 import {
     verifyToken
@@ -15,6 +15,7 @@ import { upload } from "../middleware/upload.js";
 
 const adminRouter = express.Router();
 adminRouter.post("/register-Admin",  registerAdmin);
+adminRouter.post("/verified-otp-admin",  verifiedOTP);
 adminRouter.post("/login-Admin", loginAdmin);
 adminRouter.post("/logout-Admin", logoutAdmin);
 adminRouter.get( "/admins",verifyToken,getAdmins);

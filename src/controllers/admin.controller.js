@@ -10,78 +10,84 @@ updateProfile,
 import { deleteOldImage, uploadToProfileImage } from "../utils/cloudinaryUpload.js";
 import {getIO} from '../config/socket.js'
 import { Resend } from "resend";
-// import { sendOTP } from "../services/sendOTP.js";
 import { transporter } from "../services/mailService.js";
+import { OTPContent } from "../services/otpContent.js";
+import { deleteOTP, fetchOTP, saveOTP } from "../models/otp.model.js";
 
 
 
 export const registerAdmin = async (req, res) => {
   try {
     const { name, email, password} = req.body;
-
     const existingAdmin = await findAdminByEmail(email);
     if (existingAdmin) {
       return res.status(400).json({
         message: "user Already Exist",
       });
     }
-    const hashPassword = await bcrypt.hash(password, 10);
-    await createAdmin(name, email, hashPassword);
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-
-
-    const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 40px; }
-        .container { max-width: 450px; margin: 0 auto; background: #ffffff; border-radius: 8px; padding: 40px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        h2 { color: #333; margin-bottom: 15px; }
-        p { color: #666; font-size: 15px; line-height: 24px; }
-        .otp-code { display: inline-block; background: #eef2f6; color: #00466a; padding: 15px 30px; font-size: 28px; font-weight: bold; letter-spacing: 6px; border-radius: 5px; margin: 25px 0; }
-        .footer { color: #aaa; font-size: 12px; margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <h2>Email Verification</h2>
-        <p>Enter this verification code to complete your signup.</p>
-        <div class="otp-code">${otp}</div>
-        <p>This code expires in 10 minutes. Do not share this code with anyone.</p>
-        <div class="footer">This is an automated message, please do not reply.</div>
-      </div>
-    </body>
-    </html>
-  `;
+    const expiresAt = new Date(Date.now() + 2 * 60 * 1000); 
      const mailOptions = {
-    from: "employeehub.hr@gmail.com",
-    to: email,
-    subject: "Email Verfiication",
-    text: `Your OTP code is ${otp}. It is valid for 2 minutes.`,
-     html: htmlContent
+      from: process.env.EMAIL_FROM,
+      to: email,
+      subject: "Email Verfiication",
+      text: `Your OTP code is ${otp}. It is valid for 2 minutes.`,
+      html: OTPContent(otp)
   };
-   transporter.sendMail(mailOptions, (error, info) => {
+   transporter.sendMail(mailOptions, async  (error, info) => {
     if (error) {
       console.error("Error sending email  from register Admin: ", error);
       res.status(500).send("Error sending email");
     } else {
       console.log("Email sent from register Admin", info.response);
-      res.send("Email sent successfully");
+      await saveOTP(email, otp, expiresAt)
     }
-  });
-
-
-
-
-
-    
+  }
+);  
     res.status(201).json({
-      message: "user successfully Registered",
+      message: "OTP successfully Registered",
     });
   } catch (error) {
     res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+export const verifiedOTP = async (req, res) => {
+  try {
+    const { name, email, password, otp } = req.body;
+    if (!name || !email || !password || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required.",
+      });
+    }
+    const otpRecord = await fetchOTP(email);
+    if (otpRecord.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "OTP not found.",
+      });
+    }
+    if (otpRecord[0].otp_code !== otp) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid OTP.",
+      });
+    }
+    const hashPassword = await bcrypt.hash(password, 10);
+    await createAdmin(name, email, hashPassword);
+    // await deleteOTP(email)
+    return res.status(201).json({
+      success: true,
+      message: "OTP Verified Successfully. Employee SignUp",
+    });
+
+  } catch (error) {
+    console.log("Verified OTP Error:", error);
+    return res.status(500).json({
+      success: false,
       message: error.message,
     });
   }
