@@ -43,10 +43,18 @@ export const registerAdmin = async (req, res) => {
 //       await saveOTP(email, otp, expiresAt)
 //     }
 //   }
-// );  
+// ); 
+
+(async () => {
+  try {
+    await transporter.verify();
+    console.log("SMTP Connected Successfully");
+  } catch (err) {
+    console.error("SMTP Verify Error:", err);
+  }
+})();
 
 transporter.sendMail(mailOptions, async (error, info) => {
-
   console.log("Inside sendMail callback");
 
   if (error) {
