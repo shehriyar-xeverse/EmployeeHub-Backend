@@ -13,6 +13,7 @@ import { deleteEmployeefile, deleteEmployeeImage, uploadfile, uploadToEmployeeIm
 import { createNotification } from "../models/notification.model.js";
 import { uploadEmployeesFiles } from "../models/employee_files.model.js";
  import fs from "fs";
+import { sendEmployeeRegistrationEmail } from "../services/n8n.service.js";
 
 export const createEmployee = async (req, res) => {
   try {
@@ -20,9 +21,7 @@ export const createEmployee = async (req, res) => {
       req.body;
     let employee_Image;
     const cloudinaryResponse = await uploadToEmployeeImage(req.file.buffer);
-    const publicId = cloudinaryResponse.public_id
-
-    
+    const publicId = cloudinaryResponse.public_id;
 
     employee_Image = cloudinaryResponse.secure_url;
     const employee = await AddEmployee(
@@ -153,6 +152,10 @@ export const createEmployeeRequest = async (req, res) => {
       profile_image: image.secure_url,
       employee_file :file.secure_url,
     });
+
+  
+    
+    await sendEmployeeRegistrationEmail(employee);
 
 
 

@@ -78,7 +78,7 @@ export const verifiedOTP = async (req, res) => {
     }
     const hashPassword = await bcrypt.hash(password, 10);
     await createAdmin(name, email, hashPassword);
-    // await deleteOTP(email)
+    await deleteOTP(email)
     return res.status(201).json({
       success: true,
       message: "OTP Verified Successfully. Employee SignUp",

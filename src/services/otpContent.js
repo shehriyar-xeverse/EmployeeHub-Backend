@@ -1,6 +1,3 @@
-
-
-
 export const OTPContent = (otp)  => {
     const htmlContent = `
     <!DOCTYPE html>
