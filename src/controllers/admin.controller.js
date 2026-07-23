@@ -34,16 +34,35 @@ export const registerAdmin = async (req, res) => {
       text: `Your OTP code is ${otp}. It is valid for 2 minutes.`,
       html: OTPContent(otp)
   };
-   transporter.sendMail(mailOptions, async  (error, info) => {
-    if (error) {
-      console.error("Error sending email  from register Admin: ", error);
-      res.status(500).send("Error sending email");
-    } else {
-      console.log("Email sent from register Admin", info.response);
-      await saveOTP(email, otp, expiresAt)
-    }
-  }
-);  
+//    transporter.sendMail(mailOptions, async  (error, info) => {
+//     if (error) {
+//       console.error("Error sending email  from register Admin: ", error);
+//       res.status(500).send("Error sending email");
+//     } else {
+//       console.log("Email sent from register Admin", info.response);
+//       await saveOTP(email, otp, expiresAt)
+//     }
+//   }
+// );  
+
+transporter.sendMail(mailOptions, async (error, info) => {
+
+  console.log("Inside sendMail callback");
+
+  if (error) {
+    console.log("SMTP Error:", error);
+  } else {
+    console.log("Email sent");
+
+    console.log("Saving OTP...");
+
+    await saveOTP(email, otp, expiresAt);
+
+    console.log("OTP Saved");
+  }})
+
+
+  
     res.status(201).json({
       message: "OTP successfully Registered",
     });
@@ -94,7 +113,6 @@ export const verifiedOTP = async (req, res) => {
 };
 
 export const loginAdmin = async (req, res) => {
-
   try {
     const { email, password } = req.body;
     const user = await findAdminByEmail(email);
